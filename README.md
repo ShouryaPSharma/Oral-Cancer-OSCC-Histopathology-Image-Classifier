@@ -48,8 +48,6 @@ Test accuracy achieved: **0.548** (essentially close to random guessing for a bi
 
 A few directions worth exploring, roughly in order of likely impact:
 
-- **Fix the loss function**: This is a classification problem, but the model uses `MSELoss` on softmax outputs. Switch to `nn.CrossEntropyLoss` (with raw logits, i.e., remove the `F.softmax` in `forward()` and pass integer class labels instead of one-hot vectors) — this alone often improves convergence significantly.
-- **Fix the bug in `model_test.py`**: the real-class check `if real_label[0] >= output[1]` incorrectly compares a label value to a model output value. It should compare `real_label[0]` to `real_label[1]` to correctly recover the ground-truth class. This bug may be making the reported accuracy unreliable.
 - **Train for more epochs**: only 2 epochs are currently used. Try 15–50+ with early stopping based on validation loss.
 - **Use a validation split**: currently there's only train/test, with no validation set to monitor overfitting during training.
 - **Data augmentation**: random rotations, flips, zoom, and color/contrast jitter (via `torchvision.transforms`) help the model generalize better, especially with a limited histopathology dataset.
@@ -57,9 +55,7 @@ A few directions worth exploring, roughly in order of likely impact:
 - **Use color (RGB) instead of grayscale**: staining color (e.g., H&E) often carries diagnostically relevant information that grayscale discards.
 - **Add Batch Normalization and Dropout**: helps stabilize training and reduce overfitting.
 - **Tune learning rate**: try a learning rate scheduler (`torch.optim.lr_scheduler`) or experiment with different initial rates.
-- **Check class balance**: confirm the train/test split has a reasonable balance of Normal vs OSCC samples (the script truncates `normal_training_data` to match OSCC count — verify this isn't discarding too much data).
-- **Try transfer learning**: fine-tune a pretrained model (ResNet18, EfficientNet, etc.) instead of training a small CNN from scratch — usually a big jump in accuracy for limited medical imaging datasets.
-- **Normalize with dataset statistics**: use proper mean/std normalization (e.g., via `torchvision.transforms.Normalize`) instead of just dividing by 255.
+
 
 ## Disclaimer
 
